@@ -14,7 +14,7 @@ Configuration is as follows:
 
 #### `refresh_rate`
 
-This is the rate in seconds that the add-on will fetch and send data to the TRMNL server. It does not effect how often the TRMNL device refreshes its screen.
+This is the rate in seconds that the add-on will fetch and send data to the TRMNL server. It does not effect how often the TRMNL device refreshes its screen. It has a hard-coded minimum of 300 seconds to avoid rate limiting from TRMNL's server.
 
 #### `plugins`
 
