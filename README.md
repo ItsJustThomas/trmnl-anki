@@ -1,1 +1,46 @@
-# trmnl-anki
+# TRMNL Anki
+
+TRMNL Anki is an add-on/plugin combination that allows a TRMNL to display your Anki flashcards. It supports multiple instances and mashups.
+
+## TRMNL Anki Add-on
+
+This is the add-on that is added to Anki. It scans the Anki notes at a recurring interval, gets the relevant field data for a single note, compresses it, and sends it to the TRMNL server via a webhook.
+
+### Config
+
+Configuration is as follows:
+
+#### `refresh_rate`
+
+This is the rate in seconds that the add-on will fetch and send data to the TRMNL server. It does not effect how often the TRMNL device refreshes its screen.
+
+#### `plugins`
+
+An array of configuration for TRMNL Anki plugins.
+
+#### Plugin Config
+
+##### `enabled`
+
+Disable to stop the plugin from sending data.
+
+##### `visible_fields`
+
+An array of case-sensitive strings that are Anki note fields. If a note has one of these fields, it will be sent to the TRMNL server to be displayed. Data is sent in the order that the fields are listed. This means you should order the fields in the priority they should be displayed.
+
+##### `webhook`
+
+The webhook link for the TRMNL plugin. Found on the TRMNL website.
+
+##### `search_query`
+
+The query that will be executed to find notes. This takes the same syntax as the [Anki Browser](https://docs.ankiweb.net/searching.html). Double quotes must be escaped.
+
+Example:
+```json
+"search_query": "(is:new OR is:learn OR is:review) \"note:Cantonese Basic\""
+```
+
+## TRMNL Anki Plugin
+
+This is the plugin that is used by TRMNL. It retries the compressed data, decompresses it, and displays each field in the order it was received.
