@@ -6,6 +6,8 @@ TRMNL Anki is an add-on/plugin combination that allows a TRMNL to display your A
 
 This is the add-on that is added to Anki. It scans the Anki notes at a recurring interval, gets the relevant field data for a single note, compresses it, and sends it to the TRMNL server via a webhook.
 
+[Install it here](https://ankiweb.net/shared/info/415381283)
+
 ### Config
 
 Configuration is as follows:
