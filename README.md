@@ -4,7 +4,7 @@ TRMNL Anki is an add-on/plugin combination that allows a TRMNL to display your A
 
 ## TRMNL Anki Add-on
 
-This is the add-on that is added to Anki. It scans the Anki notes at a recurring interval, gets the relevant field data for a single note, compresses it, and sends it to the TRMNL server via a webhook.
+This is the add-on that is added to Anki. It scans the Anki notes at a recurring interval, gets the relevant field data for a single note, compresses it, and sends it to the TRMNL server via a webhook. It does not support images or (of course) audio.
 
 [Install it here](https://ankiweb.net/shared/info/415381283)
 
@@ -80,4 +80,4 @@ Example:
 
 ## TRMNL Anki Plugin
 
-This is the plugin that is used by TRMNL. It retries the compressed data, decompresses it, and displays each field in the order it was received.
+This is the plugin that is used by TRMNL. It retries the compressed data, decompresses it, and displays each field in the order it was received. HTML from fields are rendered as-is.
