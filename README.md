@@ -41,6 +41,43 @@ Example:
 "search_query": "(is:new OR is:learn OR is:review) \"note:Cantonese Basic\""
 ```
 
+### Full Example
+```json
+{
+    "plugins": [
+        {
+            "search_query": "(is:new OR is:learn OR is:review) \"note:Japanese Sentence Mine\"",
+            "visible_fields": [
+                "Word",
+                "Meaning",
+                "Sentence",
+                "sentence"
+            ],
+            "webhook": "https://usetrmnl.com/api/custom_plugins/replace-this-1"
+        },
+        {
+            "search_query": "nid:1741914054864",
+            "visible_fields": [
+                "Word",
+                "Meaning",
+                "Sentence",
+                "sentence"
+            ],
+            "webhook": "https://usetrmnl.com/api/custom_plugins/replace-this-2"
+        },
+        {
+            "search_query": "\"note:AnkiJazz - Theory\"",
+            "visible_fields": [
+                "Front",
+                "Back"
+            ],
+            "webhook": "https://usetrmnl.com/api/custom_plugins/replace-this-3"
+        }
+    ],
+    "refresh_rate": "300"
+}
+```
+
 ## TRMNL Anki Plugin
 
 This is the plugin that is used by TRMNL. It retries the compressed data, decompresses it, and displays each field in the order it was received.
