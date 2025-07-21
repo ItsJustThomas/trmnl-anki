@@ -52,8 +52,7 @@ Example:
             "visible_fields": [
                 "Word",
                 "Meaning",
-                "Sentence",
-                "sentence"
+                "Sentence"
             ],
             "webhook": "https://usetrmnl.com/api/custom_plugins/replace-this-1"
         },
@@ -62,8 +61,7 @@ Example:
             "visible_fields": [
                 "Word",
                 "Meaning",
-                "Sentence",
-                "sentence"
+                "Sentence"
             ],
             "webhook": "https://usetrmnl.com/api/custom_plugins/replace-this-2"
         },
