@@ -10,7 +10,7 @@ This is the add-on that is added to Anki. It scans the Anki notes at a recurring
 
 ### Config
 
-Configuration is as follows.
+Configuration is as follows. You do not need to restart Anki for changes to take effect (unless the config change crashed the add-on, which means the thing that watches the config change also crashed).
 
 #### `refresh_rate`
 
