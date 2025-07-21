@@ -1,0 +1,9 @@
+{
+    "refresh_rate": "300",
+    "plugins": [{
+        "search_query": "deck:current",
+        "webhook": "",
+        "visible_fields": ["term", "definition", "sentence"],
+        "enabled": true
+    }]
+}
