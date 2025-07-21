@@ -2,6 +2,8 @@
 
 TRMNL Anki is an add-on/plugin combination that allows a TRMNL to display your Anki flashcards. It supports multiple instances and mashups.
 
+![Screenshot of TRMNL mashups with two instances of TRMNL Anki](https://raw.githubusercontent.com/ItsJustThomas/trmnl-anki/refs/heads/main/screenshot.png)
+
 ## TRMNL Anki Add-on
 
 This is the add-on that is added to Anki. It scans the Anki notes at a recurring interval, gets the relevant field data for a single note, compresses it, and sends it to the TRMNL server via a webhook. It does not support images or (of course) audio.
