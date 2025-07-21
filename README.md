@@ -24,7 +24,7 @@ An array of configuration for TRMNL Anki plugins.
 
 ##### `enabled`
 
-Disable to stop the plugin from sending data.
+Set to `false` to stop the plugin from sending data.
 
 ##### `visible_fields`
 
