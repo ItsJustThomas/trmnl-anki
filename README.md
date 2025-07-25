@@ -1,6 +1,6 @@
 # TRMNL Anki
 
-TRMNL Anki is an add-on/plugin combination that allows a TRMNL to display your Anki flashcards. It supports multiple instances and mashups.
+TRMNL Anki is an add-on/plugin combination that allows a TRMNL to display your Anki flashcards. It supports multiple instances and mashups. It requires a [TRMNL](https://usetrmnl.com/?ref=justthomas) with developer edition.
 
 ![Screenshot of TRMNL mashups with two instances of TRMNL Anki](https://raw.githubusercontent.com/ItsJustThomas/trmnl-anki/refs/heads/main/screenshot.png)
 
