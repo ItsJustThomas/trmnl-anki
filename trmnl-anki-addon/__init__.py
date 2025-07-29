@@ -203,7 +203,7 @@ class TRMNLAnki:
         op.run_in_background()
 
     def shutdown(self) -> None:
-        self.cease_continuous_run.clear()
+        self.cease_continuous_run.set()
         self.initialized = False
 
 
