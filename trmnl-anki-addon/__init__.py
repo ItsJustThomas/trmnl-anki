@@ -12,8 +12,8 @@ import anki.collection
 from anki.notes import Note
 from aqt import mw, gui_hooks
 from aqt.operations import QueryOp
-from aqt.utils import showInfo, qconnect
-from aqt.qt import QAction
+from aqt.utils import showInfo
+from aqt.qt import QAction, qconnect
 
 from . import schedule
 
@@ -26,7 +26,7 @@ logging.basicConfig(level=logging.INFO)
 class TRMNLPluginConfig:
     visible_fields: list = field(default_factory=list)
     webhook: str = ""
-    search_query: str = "deck:current",
+    search_query: str = "deck:current"
     enabled: bool = True
 
 
@@ -45,7 +45,7 @@ class Config:
 
 def get_config() -> Config:
     config = mw.addonManager.getConfig(__name__)
-    return Config(**config)
+    return Config(**(config or {}))
 
 
 def compress_text(text):
@@ -118,6 +118,9 @@ class TRMNLPlugin:
         Returns:
             requests.Response: Response from the webhook call
         """
+        if not mw.col:
+            raise Exception(f"TRMNL Anki: Anki collection is not initialized (how did you get here?)")
+
         note = self.get_new_note(mw.col)
         if not self.config.webhook:
             raise Exception(f"TRMNL Anki: No webhook url given to TRMNL")
@@ -143,15 +146,13 @@ class TRMNLAnki:
         # Start background thread
         self.cease_continuous_run = threading.Event()
 
-        class ScheduleThread(threading.Thread):
-            @classmethod
-            def run(cls):
-                while not self.cease_continuous_run.is_set():
-                    schedule.run_pending()
-                    time.sleep(1)
+        def background_task():
+            while not self.cease_continuous_run.is_set():
+                schedule.run_pending()
+                time.sleep(1)
 
         logger.info(f"{__name__}: Starting thread")
-        continuous_thread = ScheduleThread(daemon=True)
+        continuous_thread = threading.Thread(target=background_task, daemon=True)
         continuous_thread.start()
         self.initialized = True
 
