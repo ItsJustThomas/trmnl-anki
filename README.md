@@ -16,7 +16,7 @@ Configuration is as follows. You do not need to restart Anki for changes to take
 
 #### `refresh_rate`
 
-This is the rate in seconds that the add-on will fetch and send data to the TRMNL server. It does not effect how often the TRMNL device refreshes its screen. It has a hard-coded minimum of 300 seconds to avoid rate limiting from TRMNL's server. To help aid initial setup, you can force the add-on to refresh in the Anki menu under `Tools > Refresh TRMNL` (This can still be affected by the rate limiting).
+This is the rate in seconds that the add-on will fetch and send data to the TRMNL server. It does not affect how often the TRMNL device refreshes its screen. It has a hard-coded minimum of 300 seconds to avoid rate limiting from TRMNL's server. To help aid initial setup, you can force the add-on to refresh in the Anki menu under `Tools > Refresh TRMNL` (This can still be affected by the rate limiting).
 
 #### `plugins`
 
