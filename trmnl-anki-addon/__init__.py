@@ -218,7 +218,7 @@ class TRMNLAnki:
 
     def refresh_trmnl(self) -> None:
         """
-        Refreshes TRMNL using a background operation. Can only be called in the main thread.
+        Refreshes TRMNL. Uses a QueryOp when called on the main thread.
         """
         if threading.current_thread() is threading.main_thread():
             def on_success(responses: tuple[list[requests.Response], list[Exception]]):
@@ -262,3 +262,4 @@ gui_hooks.main_window_did_init.append(trmnl_anki.start)
 gui_hooks.profile_will_close.append(trmnl_anki.shutdown)
 
 logger.info(f"{__name__} loaded")
+
