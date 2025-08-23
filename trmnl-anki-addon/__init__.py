@@ -2,7 +2,10 @@ import base64
 import json
 import logging
 import random
+from typing import Any
+
 import requests
+from requests.adapters import HTTPAdapter
 import threading
 import time
 import zlib
@@ -20,6 +23,12 @@ from . import schedule
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 logging.basicConfig(level=logging.INFO)
+
+session = requests.Session()
+
+# We don't care about retries since we're already doing requests at a recurring interval
+session.mount('http://', HTTPAdapter(max_retries=0))
+session.mount('https://', HTTPAdapter(max_retries=0))
 
 
 @dataclass
@@ -41,6 +50,15 @@ class Config:
             for plugin in (plugins or [])
         ]
         self.refresh_rate = max(int(refresh_rate), 310)
+
+
+class ConfigException(Exception):
+    def __init__(self, message, config: tuple[str, Any]):
+        super().__init__(message)
+        self.config = config
+
+    def __str__(self):
+        return super().__str__() + f"{self.config[0]}: {str(self.config[1])}"
 
 
 def get_config() -> Config:
@@ -81,7 +99,10 @@ class TRMNLPlugin:
     def get_new_note(self, col: anki.collection.Collection) -> Note:
         notes = col.find_notes(query=self.config.search_query)
         if not notes:
-            raise Exception("TRMNL Anki: No notes found with the search query: " + self.config.search_query)
+            raise ConfigException(
+                "TRMNL Anki: No notes found with the search query",
+                ("search_query", self.config.search_query)
+            )
 
         note = col.get_note(random.choice(notes))
         logger.info("Selected note: %s", note.id)
@@ -107,7 +128,7 @@ class TRMNLPlugin:
         #   -H "Content-Type: application/json" \
         #   -d '{"merge_variables": {"term":"foobar"}}' \
         #   -X POST
-        response = requests.post(
+        response = session.post(
             self.config.webhook, json={'merge_variables': {'note_id': note.id, **payload}}
         )
         logger.info(f"{response.status_code}: {response.reason} {response.text}")
@@ -123,7 +144,10 @@ class TRMNLPlugin:
 
         note = self.get_new_note(mw.col)
         if not self.config.webhook:
-            raise Exception(f"TRMNL Anki: No webhook url given to TRMNL")
+            raise ConfigException(
+                "TRMNL Anki: No webhook url given to TRMNL",
+                ("webhook", self.config.webhook)
+            )
         return self.call_webhook(note)
 
 
@@ -177,31 +201,46 @@ class TRMNLAnki:
         self.trmnl_job = schedule.every(int(self.config.refresh_rate)).seconds.do(self.refresh_trmnl)
         return text
 
-    def refresh_trmnl(self):
+    def _refresh_trmnl(self):
         logger.info("Refreshing TRMNL")
+
         responses = []
+        errors = []
         for plugin in self.trmnl_plugins:
             if plugin.config.enabled:
-                responses.append(plugin.refresh_trmnl_plugin())
-        return responses
+                try:
+                    responses.append(plugin.refresh_trmnl_plugin())
+                except Exception as e:
+                    errors.append(e)
+                    logger.warning(e)
 
-    def refresh_trmnl_async(self) -> None:
+        return responses, errors
+
+    def refresh_trmnl(self) -> None:
         """
         Refreshes TRMNL using a background operation. Can only be called in the main thread.
         """
+        if threading.current_thread() is threading.main_thread():
+            def on_success(responses: tuple[list[requests.Response], list[Exception]]):
+                info = ""
+                for response in responses[0]:
+                    if not response.ok:
+                        info = (f"{info} \n Refreshing failed. " +
+                                f"{response.status_code}: {response.reason} {response.text}")
+                for exception in responses[1]:
+                    info = f"{info} \n Internal error: {exception}"
 
-        def on_success(responses: list[requests.Response]):
-            for response in responses:
-                if not response.ok:
-                    showInfo(f"Refreshing failed. "
-                             f"{response.status_code}: {response.reason} {response.text}")
+                if info:
+                    showInfo(info)
 
-        op = QueryOp(
-            parent=mw,
-            op=lambda col: self.refresh_trmnl(),
-            success=on_success
-        )
-        op.run_in_background()
+            op = QueryOp(
+                parent=mw,
+                op=lambda col: self._refresh_trmnl(),
+                success=on_success
+            )
+            op.run_in_background()
+        else:
+            self._refresh_trmnl()
 
     def shutdown(self) -> None:
         self.cease_continuous_run.set()
@@ -212,7 +251,7 @@ trmnl_anki = TRMNLAnki()
 
 # Add menu item to refresh TRMNL
 action = QAction("Refresh TRMNL", mw)
-qconnect(action.triggered, trmnl_anki.refresh_trmnl_async)
+qconnect(action.triggered, trmnl_anki.refresh_trmnl)
 mw.form.menuTools.addAction(action)
 
 # Refresh config on change
