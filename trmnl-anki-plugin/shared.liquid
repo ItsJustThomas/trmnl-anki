@@ -1,13 +1,13 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/dayjs@1/dayjs.min.js"></script>
+{% assign anki_id = "anki-" | append_random %}
 <style>
-  [data-plugin-instance="{{ trmnl.plugin_settings.instance_name }}"] .content > :first-child {
-    font-size: 2rem;
-    line-height: 2rem;
+  #{{ anki_id }} .content > :first-child {
+    font-size: 1.5rem;
+    line-height: 1.5rem;
   }
 </style>
 
-<div data-plugin-instance="{{ trmnl.plugin_settings.instance_name }}">
+<div id="{{ anki_id }}">
   <div class="layout">
     <div class="richtext richtext--center gap--large">
       <div data-content-limiter="true" class="markdown content content--center gap text--center pt--1">
@@ -18,7 +18,7 @@
   <div class="title_bar">
     <img class="image" src="https://usetrmnl.com/images/plugins/trmnl--render.svg">
     <span class="title">{{ trmnl.plugin_settings.instance_name }}</span>
-    <span class="instance">Created on: <span class="note-id">{{ note_id }}</span></span>
+    <span class="instance">Created on: {{ note_id | divided_by: 1000 | plus: trmnl.user.utc_offset | date: '%b %d, %Y' }}</span>
   </div>
 </div>
 
@@ -47,7 +47,7 @@
     function populate(data, instance) {
       const decompressedData = JSON.parse(decompressText(data));
       console.log(JSON.stringify(decompressedData));
-      const instanceDiv = document.querySelector(`[data-plugin-instance="${instance}"]`)
+      const instanceDiv = document.getElementById(instance)
       const mainContainer = instanceDiv.querySelector(`.content`);
       Object.entries(decompressedData).forEach(([key, value]) => {
         if (!value) {
@@ -63,8 +63,7 @@
       mainContainer.firstElementChild?.setAttribute("data-value-fit-max-height", "340");
 
       const noteTimestamp = instanceDiv.querySelector(`.note-id`);
-      noteTimestamp.innerHTML = dayjs(parseInt(noteTimestamp.innerHTML)).format('MMM DD, YYYY');
     }
-    populate("{{ compressed }}", "{{ trmnl.plugin_settings.instance_name }}");
+    populate("{{ compressed }}", "{{ anki_id }}");
   });
 </script>
