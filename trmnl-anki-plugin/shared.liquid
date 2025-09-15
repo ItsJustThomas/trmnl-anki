@@ -7,19 +7,17 @@
   }
 </style>
 
-<div id="{{ anki_id }}">
-  <div class="layout">
-    <div class="richtext richtext--center gap--large">
-      <div data-content-limiter="true" class="markdown content content--center gap text--center pt--1">
-      </div>
+<div class="layout layout--col" id="{{ anki_id }}">
+  <div class="richtext richtext--center gap--large" data-overflow="true">
+    <div data-content-limiter="true" class="markdown content content--center gap text--center pt--1">
     </div>
   </div>
-  
-  <div class="title_bar">
-    <img class="image" src="https://usetrmnl.com/images/plugins/trmnl--render.svg">
-    <span class="title">{{ trmnl.plugin_settings.instance_name }}</span>
-    <span class="instance">Created on: {{ note_id | divided_by: 1000 | plus: trmnl.user.utc_offset | date: '%b %d, %Y' }}</span>
-  </div>
+</div>
+
+<div class="title_bar">
+  <img class="image" src="https://usetrmnl.com/images/plugins/trmnl--render.svg">
+  <span class="title">{{ trmnl.plugin_settings.instance_name }}</span>
+  <span class="instance">Created on: {{ note_id | divided_by: 1000 | plus: trmnl.user.utc_offset | date: '%b %d, %Y' }}</span>
 </div>
 
 <script>
