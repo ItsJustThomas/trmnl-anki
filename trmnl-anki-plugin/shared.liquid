@@ -1,27 +1,42 @@
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
-{% assign anki_id = "anki-" | append_random %}
-<style>
-  #{{ anki_id }} .content > :first-child {
-    font-size: 1.5rem;
-    line-height: 1.5rem;
-  }
-</style>
+{% comment %}
+  TRMNL prepends this file to every layout, and a mashup renders it once per view,
+  so everything here has to be safe to repeat on one page.
 
-<div class="layout layout--col" id="{{ anki_id }}">
-  <div class="richtext richtext--center gap--large" data-overflow="true">
-    <div data-content-limiter="true" class="markdown content content--center gap text--center pt--1">
+  Each layout file renders the `anki_card` template below with its own text sizes.
+  The add-on sends `note_id` and `compressed` (zlib + base64 JSON of field name -> HTML).
+{% endcomment %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
+
+{% template anki_card %}
+{% assign anki_id = "anki-" | append_random %}
+<div class="layout layout--col layout--center" id="{{ anki_id }}">
+  {% if compressed %}
+    <div class="richtext richtext--center gap--medium w--full">
+      <div class="content {{ primary_size }} text--center">
+        <div data-anki-primary data-value-fit="true" data-value-fit-max-height="{{ primary_max_height }}"></div>
+      </div>
+      <div class="content {{ secondary_size }} text--center gap--small" data-anki-secondary
+           data-content-limiter="true"></div>
     </div>
-  </div>
+  {% else %}
+    <span class="description description--large text--center">No card yet. In Anki, use Tools &gt; Refresh TRMNL.</span>
+  {% endif %}
 </div>
 
 <div class="title_bar">
-  <img class="image" src="https://usetrmnl.com/images/plugins/trmnl--render.svg">
+  <img class="image image--adaptive" src="https://trmnl.com/images/plugins/trmnl--render.svg">
   <span class="title">{{ trmnl.plugin_settings.instance_name }}</span>
-  <span class="instance">Created on: {{ note_id | divided_by: 1000 | plus: trmnl.user.utc_offset | date: '%b %d, %Y' }}</span>
+  {% if note_id %}
+    <span class="instance">Created on: {{ note_id | divided_by: 1000 | plus: trmnl.user.utc_offset | date: '%b %d, %Y' }}</span>
+  {% endif %}
 </div>
 
+{% if compressed %}
 <script>
-  document.addEventListener("DOMContentLoaded", function(e) { 
+  document.addEventListener("DOMContentLoaded", function () {
+    const layout = document.getElementById("{{ anki_id }}");
+    if (!layout) return;
+
     // Yoinked from https://github.com/albert7617/trmnl-japanese
     function decompressText(compressedText) {
       // Decode the base64 string to binary data
@@ -42,26 +57,30 @@
       return decoder.decode(decompressedBytes);
     }
 
-    function populate(data, instance) {
-      const decompressedData = JSON.parse(decompressText(data));
-      console.log(JSON.stringify(decompressedData));
-      const instanceDiv = document.getElementById(instance)
-      const mainContainer = instanceDiv.querySelector(`.content`);
-      Object.entries(decompressedData).forEach(([key, value]) => {
-        if (!value) {
-          return;
-        }
-        console.log(`${key} ${value}`);
-        const el = document.createElement("span");
-        // We intentionally don't escape the value since anki fields can contain styled HTML
-        el.innerHTML = value;
-        mainContainer.appendChild(el);
-      });
-      mainContainer.firstElementChild?.setAttribute("data-value-fit", "true");
-      mainContainer.firstElementChild?.setAttribute("data-value-fit-max-height", "340");
-
-      const noteTimestamp = instanceDiv.querySelector(`.note-id`);
+    let fields;
+    try {
+      fields = JSON.parse(decompressText("{{ compressed }}"));
+    } catch (error) {
+      console.error("TRMNL Anki: could not read note data", error);
+      return;
     }
-    populate("{{ compressed }}", "{{ anki_id }}");
+
+    const values = Object.keys(fields)
+      .map(function (key) { return fields[key]; })
+      .filter(function (value) { return value && String(value).trim() !== ""; });
+
+    const primary = layout.querySelector("[data-anki-primary]");
+    const secondary = layout.querySelector("[data-anki-secondary]");
+
+    // We intentionally don't escape the value since anki fields can contain styled HTML
+    primary.innerHTML = values[0] || "";
+    values.slice(1).forEach(function (value) {
+      const field = document.createElement("div");
+      field.innerHTML = value;
+      secondary.appendChild(field);
+    });
+    if (!secondary.children.length) secondary.remove();
   });
 </script>
+{% endif %}
+{% endtemplate %}

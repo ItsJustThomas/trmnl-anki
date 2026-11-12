@@ -1,6 +1,4 @@
-<style>
-  #{{ anki_id }} .content > :first-child {
-    font-size: 2rem;
-    line-height: 2rem;
-  }
-</style>
+{% render "anki_card",
+  compressed: compressed, note_id: note_id, trmnl: trmnl,
+  primary_size: "content--xxxlarge", primary_max_height: 200,
+  secondary_size: "content--large" %}

@@ -10,3 +10,4 @@ polling_body: ''
 id: 121969
 name: Anki
 refresh_interval: 15
+framework_version: v3.4.6
